@@ -1,5 +1,9 @@
 const router=require('express').Router();
-router.get('/',(req,res,next)=>{
-res.send('hello');
-})
+const userController=require('../Controller/User')
+router.use('/users',userController)
 module.exports=router
+// import express from "express";
+
+// const app=express();
+// const userController=require('../Controller/User')
+// app.use('/api',userController)
