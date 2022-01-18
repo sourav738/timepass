@@ -4,12 +4,14 @@ res.send('hello');
 })
 
 router.post('/',(req,res,next)=>{
+    console.log(req.body);
     console.log("post requset is coming");
     res.json({success:'ok'})
   
 })
 
 router.put('/',(req,res,next)=>{
+    console.log(req.body);
     res.json({success:'ok put request is working'})
 })
 
