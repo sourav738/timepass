@@ -1,25 +1,26 @@
-const router=require('express').Router();
-router.get('/',(req,res,next)=>{
-res.send('hello');
+const router = require('express').Router();
+const  addUser =require('../validation/validation') 
+const { body, validationResult } = require('express-validator');
+console.log({addUser});
+router.get('/', (req, res, next) => {
+    res.send('hello');
 })
 
-router.post('/',(req,res,next)=>{
-    console.log(req.body);
-    console.log("post requset is coming");
-    res.json({success:'ok'})
-  
+router.post('/' ,addUser.addUser, (req, res, next) => {
+    // const err=validationResult(req)
+    // console.log({err});
+    res.json({ success: 'ok' })
 })
 
-router.put('/',(req,res,next)=>{
-    console.log(req.body);
-    res.json({success:'ok put request is working'})
+router.put('/', (req, res, next) => {
+    res.json({ success: 'ok put request is working' })
 })
 
-router.patch('/',(req,res,next)=>{
-    res.json({success:'ok patch request is working'})
+router.patch('/', (req, res, next) => {
+    res.json({ success: 'ok patch request is working' })
 })
 
-router.delete('/',(req,res,next)=>{
-    res.json({success:'ok delete request is working'})
+router.delete('/', (req, res, next) => {
+    res.json({ success: 'ok delete request is working' })
 })
-module.exports=router
+module.exports = router
