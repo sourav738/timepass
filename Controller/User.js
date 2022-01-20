@@ -1,12 +1,12 @@
 const router = require('express').Router();
 const  addUser =require('../validation/validation') 
-const { body, validationResult } = require('express-validator');
-console.log({addUser});
 router.get('/', (req, res, next) => {
     res.send('hello');
 })
 
-router.post('/' ,addUser.addUser, (req, res, next) => {
+router.post('/' ,async  (req, res, next) => {
+  
+    const errorCheck=await addUser.addUser(req.body)
     // const err=validationResult(req)
     // console.log({err});
     res.json({ success: 'ok' })
