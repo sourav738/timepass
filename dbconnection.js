@@ -13,3 +13,4 @@ if(err){
     console.log("database is connected");
 }
 })
+module.exports=con;
