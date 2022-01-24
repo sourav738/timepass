@@ -14,7 +14,7 @@ router.post('/', addUser.addUser, (req, res, next) => {
     }
     const email = req.body.email;
     const phone_no = req.body.phone_no;
-    const userInsertQuery = `INSERT INTO users (first_name,middle_name,last_name,email,password,phone_no) VALUES('${first_name}','${middle_name}','${last_name}','${email}','123456',${phone_no})`
+    const userInsertQuery = `INSERT INTO users (first_name,middle_name,last_name,email,password,phone_no) VALUES('${first_name}','${middle_name}','${last_name}','${email}',,${phone_no})`
     con.query(userInsertQuery, function (err, result) {
         if (err) throw err;
         return res.status(200).json({
