@@ -22,6 +22,22 @@ const addUser = (req, res, next) => {
         next();
     }
 }
+const loginValidation = (req,res,next) =>{
+    console.log(req.bodycvf);
+const userSchema = Joi.object({
+   email:Joi.string().email().required(),
+   password:Joi.string().min(8).alphanum().required()
+})
+const loginDataValidate=userSchema.validate(req.body)
+if(loginDataValidate.error){
+    return res.status(400).json({
+        message:loginDataValidate.error.details
+    })
+}else{
+    next();
+}
+}
 module.exports = {
-    addUser: addUser
+    addUser: addUser,
+    loginValidation:loginValidation
 }
