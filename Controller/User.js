@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const addUser = require('../validation/validation')
 const con = require('../dbconnection');
 const hashPassword = require('../config/constant');
-const res = require('express/lib/response');
+const userAuthentication = require('../auth/authentication');
 router.get('/', (req, res, next) => {
     res.send('hello');
 })
@@ -55,13 +55,24 @@ router.delete('/', (req, res, next) => {
 router.post('/login', addUser.loginValidation, (req, res, next) => {
     const email = req.body.email
     const userPassword = req.body.password;
+    const userRecord = {}
     const fetchUserDetails = `SELECT * FROM users WHERE email='${email}'`;
     con.query(fetchUserDetails, (err, result) => {
         if (result.length > 0) {
             const password = result[0].password
             try {
                 var passwordCheck = bcrypt.compareSync(userPassword, password);
-
+                if (passwordCheck) {
+                    const jwtToken = userAuthentication.jwtTokenCreate(result[0]);
+                    userRecord.id = result[0].id
+                    userRecord.email = result[0].email
+                    userRecord.token = jwtToken
+                    return res.status(200).json({
+                        success: 'OK',
+                        msg: 'Successfully Loggedin',
+                        data: userRecord
+                    })
+                }
             } catch (error) {
                 console.log({ error });
             }
