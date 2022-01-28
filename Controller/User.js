@@ -20,7 +20,7 @@ router.post('/', addUser.addUser, async (req, res, next) => {
     }
     const email = req.body.email;
     const phone_no = req.body.phone_no;
-    const emailExist = `SELECT * FROM users WHERE email='${email}'`
+    const emailExist = `SELECT * FROM tbl_users WHERE email='${email}'`
     console.log({ emailExist })
     con.query(emailExist, function (err, result) {
         console.log({ result });
@@ -29,7 +29,7 @@ router.post('/', addUser.addUser, async (req, res, next) => {
                 success: 'OK', message: 'Email is Already Taken.'
             })
         } else {
-            const userInsertQuery = `INSERT INTO users (first_name,middle_name,last_name,email,password,phone_no) VALUES('${first_name}','${middle_name}','${last_name}','${email}','${hashingPassword}',${phone_no})`
+            const userInsertQuery = `INSERT INTO tbl_users (first_name,middle_name,last_name,email,password,phone_no) VALUES('${first_name}','${middle_name}','${last_name}','${email}','${hashingPassword}',${phone_no})`
             con.query(userInsertQuery, function (err, result) {
                 if (err) throw err;
                 return res.status(200).json({
@@ -56,7 +56,7 @@ router.post('/login', addUser.loginValidation, (req, res, next) => {
     const email = req.body.email
     const userPassword = req.body.password;
     const userRecord = {}
-    const fetchUserDetails = `SELECT * FROM users WHERE email='${email}'`;
+    const fetchUserDetails = `SELECT * FROM tbl_users WHERE email='${email}'`;
     con.query(fetchUserDetails, (err, result) => {
         if (result.length > 0) {
             const password = result[0].password
