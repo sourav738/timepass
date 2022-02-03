@@ -20,6 +20,7 @@ router.post('/', addUser.addUser, async (req, res, next) => {
     }
     const email = req.body.email;
     const phone_no = req.body.phone_no;
+    const randomCode=await hashPassword.randomCode(6)
     const emailExist = `SELECT * FROM tbl_users WHERE email='${email}'`
     console.log({ emailExist })
     con.query(emailExist, function (err, result) {
@@ -29,7 +30,8 @@ router.post('/', addUser.addUser, async (req, res, next) => {
                 success: 'OK', message: 'Email is Already Taken.'
             })
         } else {
-            const userInsertQuery = `INSERT INTO tbl_users (first_name,middle_name,last_name,email,password,phone_no) VALUES('${first_name}','${middle_name}','${last_name}','${email}','${hashingPassword}',${phone_no})`
+            const userInsertQuery = `INSERT INTO tbl_users (first_name,middle_name,last_name,email,password,phone_no,unique_code) VALUES('${first_name}','${middle_name}','${last_name}','${email}','${hashingPassword}',${phone_no},'${randomCode}')`
+            console.log({userInsertQuery});
             con.query(userInsertQuery, function (err, result) {
                 if (err) throw err;
                 return res.status(200).json({
@@ -66,6 +68,7 @@ router.post('/login', addUser.loginValidation, (req, res, next) => {
                     const jwtToken = userAuthentication.jwtTokenCreate(result[0]);
                     userRecord.id = result[0].id
                     userRecord.email = result[0].email
+                    userRecord.uniqueCode = result[0].unique_code
                     userRecord.token = jwtToken
                     return res.status(200).json({
                         success: 'OK',
@@ -78,7 +81,7 @@ router.post('/login', addUser.loginValidation, (req, res, next) => {
             }
 
         } else {
-            return res.status(400).json({
+            return res.status(200).json({
                 success: 'OK',
                 msg: 'Incorrect Username Or Password'
             })

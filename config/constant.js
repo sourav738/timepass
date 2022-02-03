@@ -1,9 +1,9 @@
 const bcrypt = require('bcrypt');
 const salt = 'myapp'
 const cryptPassword = async (password) => {
-  let hash = bcrypt.hashSync( password, 10 );
+  let hash = bcrypt.hashSync(password, 10);
   return hash
- }
+}
 const comparePassword = (plainPass, hashword, callback) => {
   bcrypt.genSalt(10, function (err, salt) {
     if (err)
@@ -14,7 +14,18 @@ const comparePassword = (plainPass, hashword, callback) => {
     });
   });
 }
+
+const randomCode = (length) => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
 module.exports = {
   cryptPassword: cryptPassword,
-  comparePassword: comparePassword
+  comparePassword: comparePassword,
+  randomCode:randomCode
 }
