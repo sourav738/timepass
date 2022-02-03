@@ -4,6 +4,7 @@ const addUser = require('../validation/validation')
 const con = require('../dbconnection');
 const hashPassword = require('../config/constant');
 const userAuthentication = require('../auth/authentication');
+const req = require('express/lib/request');
 router.get('/', (req, res, next) => {
     res.send('hello');
 })
@@ -71,7 +72,7 @@ router.post('/login', addUser.loginValidation, (req, res, next) => {
                     userRecord.uniqueCode = result[0].unique_code
                     userRecord.token = jwtToken
                     return res.status(200).json({
-                        success: 'OK',
+                        status: 'OK',
                         msg: 'Successfully Loggedin',
                         data: userRecord
                     })
@@ -82,11 +83,30 @@ router.post('/login', addUser.loginValidation, (req, res, next) => {
 
         } else {
             return res.status(200).json({
-                success: 'OK',
+                status: 'FAILED',
                 msg: 'Incorrect Username Or Password'
             })
         }
     })
 
+})
+
+router.get('/get-code',async (req,res,next)=>{
+    const token=userAuthentication.jwtTokenValidate(req)
+    if(token){
+        const user_id=token.id;
+        const userData=`SELECT unique_code FROM tbl_users WHERE id=${user_id}`
+        const uniqueCode=con.query(userData,(err,data)=>{
+            const uniqueCCode=data[0].unique_code;
+            return res.status(200).json({
+                status:'OK',
+                code:uniqueCCode
+            })
+        })
+    }else{
+        return res.status(403).json({
+            msg:'Access Forbidden'
+        })
+    }
 })
 module.exports = router
