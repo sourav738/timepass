@@ -1,4 +1,4 @@
-import mysql from 'mysql'
+const mysql=require('mysql');
 require('dotenv').config();
 console.log("USERNAME IS"+process.env.DB_USERNAME);
 var con=mysql.createConnection({
