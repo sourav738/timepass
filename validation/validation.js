@@ -6,7 +6,7 @@ const addUser = (req, res, next) => {
         last_name: Joi.required(),
         email: Joi.string().email().required(),
         phone_no: Joi.string().length(10).pattern(/^[0-9]+$/),
-        password:Joi.string().min(8).alphanum().required()
+        password: Joi.string().min(8).alphanum().required()
     });
     try {
         const validateCheck = userSchema.validate(req.body);
@@ -22,16 +22,30 @@ const addUser = (req, res, next) => {
         next();
     }
 }
-const loginValidation = (req,res,next) =>{
-    console.log(req.bodycvf);
-const userSchema = Joi.object({
-   email:Joi.string().email().required(),
-   password:Joi.string().min(8).alphanum().required()
+const loginValidation = (req, res, next) => {
+    const userSchema = Joi.object({
+        email: Joi.string().email().required(),
+        password: Joi.string().min(8).alphanum().required()
+    })
+    const loginDataValidate = userSchema.validate(req.body)
+    if (loginDataValidate.error) {
+        return res.status(400).json({
+            message: loginDataValidate.error.details
+        })
+    } else {
+        next();
+    }
+}
+
+const formValidation = (req, res, next) => {
+const uniqueCode=Joi.object({
+    unique_code:Joi.string().required()
 })
-const loginDataValidate=userSchema.validate(req.body)
-if(loginDataValidate.error){
+const uniqueCodeValidation=uniqueCode.validate(req.body)
+console.log(uniqueCodeValidation.error);
+if(uniqueCodeValidation.error){
     return res.status(400).json({
-        message:loginDataValidate.error.details
+        message:uniqueCodeValidation.error.details[0].message
     })
 }else{
     next();
@@ -39,5 +53,6 @@ if(loginDataValidate.error){
 }
 module.exports = {
     addUser: addUser,
-    loginValidation:loginValidation
+    loginValidation: loginValidation,
+    formValidation: formValidation
 }
