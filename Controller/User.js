@@ -1,10 +1,21 @@
 const router = require('express').Router();
 const bcrypt = require('bcrypt');
+const multer  = require('multer')
 const addUser = require('../validation/validation')
 const con = require('../dbconnection');
 const hashPassword = require('../config/constant');
 const userAuthentication = require('../auth/authentication');
 const req = require('express/lib/request');
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, '/tmp/my-uploads')
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, file.fieldname + '-' + uniqueSuffix)
+    }
+})
+const upload = multer({ storage: storage })
 router.get('/', (req, res, next) => {
     res.send('hello');
 })
@@ -21,7 +32,7 @@ router.post('/', addUser.addUser, async (req, res, next) => {
     }
     const email = req.body.email;
     const phone_no = req.body.phone_no;
-    const randomCode=await hashPassword.randomCode(6)
+    const randomCode = await hashPassword.randomCode(6)
     const emailExist = `SELECT * FROM tbl_users WHERE email='${email}'`
     console.log({ emailExist })
     con.query(emailExist, function (err, result) {
@@ -32,7 +43,7 @@ router.post('/', addUser.addUser, async (req, res, next) => {
             })
         } else {
             const userInsertQuery = `INSERT INTO tbl_users (first_name,middle_name,last_name,email,password,phone_no,unique_code) VALUES('${first_name}','${middle_name}','${last_name}','${email}','${hashingPassword}',${phone_no},'${randomCode}')`
-            console.log({userInsertQuery});
+            console.log({ userInsertQuery });
             con.query(userInsertQuery, function (err, result) {
                 if (err) throw err;
                 return res.status(200).json({
@@ -91,22 +102,26 @@ router.post('/login', addUser.loginValidation, (req, res, next) => {
 
 })
 
-router.get('/get-code',async (req,res,next)=>{
-    const token=userAuthentication.jwtTokenValidate(req)
-    if(token){
-        const user_id=token.id;
-        const userData=`SELECT unique_code FROM tbl_users WHERE id=${user_id}`
-        const uniqueCode=con.query(userData,(err,data)=>{
-            const uniqueCCode=data[0].unique_code;
+router.get('/get-code', async (req, res, next) => {
+    const token = userAuthentication.jwtTokenValidate(req)
+    if (token) {
+        const user_id = token.id;
+        const userData = `SELECT unique_code FROM tbl_users WHERE id=${user_id}`
+        const uniqueCode = con.query(userData, (err, data) => {
+            const uniqueCCode = data[0].unique_code;
             return res.status(200).json({
-                status:'OK',
-                code:uniqueCCode
+                status: 'OK',
+                code: uniqueCCode
             })
         })
-    }else{
+    } else {
         return res.status(403).json({
-            msg:'Access Forbidden'
+            msg: 'Access Forbidden'
         })
     }
+})
+
+router.post('/photo-upload', async (req, res, next) => {
+
 })
 module.exports = router

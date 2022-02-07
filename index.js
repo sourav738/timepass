@@ -1,6 +1,5 @@
 const express=require('express');
 const app = express();
-const multer = require('multer');
 var upload = multer();
 app.use(upload.array())
 require('dotenv').config();
