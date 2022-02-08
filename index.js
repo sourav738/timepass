@@ -1,11 +1,14 @@
 const express=require('express');
 const app = express();
-var upload = multer();
-app.use(upload.array())
+const path = require('path');
+// var upload = multer();
+// app.use(upload.array())
 require('dotenv').config();
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(express.static('public'))
+// app.use(express.static(path.join(__dirname, '/public')));
+// express.static(path.join(__dirname, '/public'));
+console.log("directory",__dirname)
 const dbConnect = require('./dbconnection')
 const apiRoutes = require('./Routes/index')
 app.use((req, res, next) => {

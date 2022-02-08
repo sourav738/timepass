@@ -8,7 +8,7 @@ const userAuthentication = require('../auth/authentication');
 const req = require('express/lib/request');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, '/tmp/my-uploads')
+        cb(null, './public/uploads')
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
@@ -121,7 +121,11 @@ router.get('/get-code', async (req, res, next) => {
     }
 })
 
-router.post('/photo-upload', async (req, res, next) => {
-
+router.post('/photo-upload', upload.single("profilephoto"), async (req, res, next) => {
+    if(req.file){
+        return res.status(200).json({
+            msg:'Profile Photo Is uploaded'
+        })
+    }
 })
 module.exports = router
