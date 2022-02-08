@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const bcrypt = require('bcrypt');
-const multer  = require('multer')
+const multer = require('multer')
+const fs = require('fs');
 const addUser = require('../validation/validation')
 const con = require('../dbconnection');
 const hashPassword = require('../config/constant');
@@ -121,11 +122,32 @@ router.get('/get-code', async (req, res, next) => {
     }
 })
 
-router.post('/photo-upload', upload.single("profilephoto"), async (req, res, next) => {
-    if(req.file){
-        return res.status(200).json({
-            msg:'Profile Photo Is uploaded'
+router.post('/photo-upload', userAuthentication.jwtTokenAuthenticate, upload.single("profilephoto"), async (req, res, next) => {
+    const userId = req.decode.id
+    const fileQuery = `SELECT profile_image FROM tbl_users WHERE id=${userId} `;
+    con.query(fileQuery, (err, imageData) => {
+        if (imageData[0].profile_image != 'NULL') {
+            const existFileName = imageData[0].profile_image
+            try {
+                if (fs.existsSync('./public/uploads/' + existFileName)) {
+                    fs.unlinkSync('./public/uploads/' + existFileName);
+                }
+
+            } catch (error) {
+            }
+
+        }
+        const sqlQuery = `UPDATE tbl_users SET profile_image='${req.file.filename}' WHERE id=${userId}`;
+        con.query(sqlQuery, (err, data) => {
+            if (req.file) {
+                const path = hashPassword.base_url;
+                return res.status(200).json({
+                    imagepath: path + '/uploads/' + req.file.filename,
+                    msg: 'Profile Photo Is uploaded'
+                })
+            }
         })
-    }
+    })
+
 })
 module.exports = router

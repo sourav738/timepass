@@ -27,5 +27,6 @@ const randomCode = (length) => {
 module.exports = {
   cryptPassword: cryptPassword,
   comparePassword: comparePassword,
-  randomCode:randomCode
+  randomCode:randomCode,
+  base_url:'http://localhost:8000'
 }
