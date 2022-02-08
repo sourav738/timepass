@@ -6,7 +6,7 @@ const path = require('path');
 require('dotenv').config();
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(express.static(path.join(__dirname, '/public')));
+//app.use(express.static(path.join(__dirname, '/public')));
 // express.static(path.join(__dirname, '/public'));
 console.log("directory",__dirname)
 const dbConnect = require('./dbconnection')
@@ -16,6 +16,7 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.setHeader('Access-Control-Allow-Credentials', true);
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, * ");
     next();
 })
 app.use('/api', apiRoutes)

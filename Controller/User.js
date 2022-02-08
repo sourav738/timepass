@@ -12,6 +12,7 @@ const storage = multer.diskStorage({
         cb(null, './public/uploads')
     },
     filename: function (req, file, cb) {
+      
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
         cb(null, file.fieldname + '-' + uniqueSuffix)
     }
@@ -123,6 +124,8 @@ router.get('/get-code', async (req, res, next) => {
 })
 
 router.post('/photo-upload', userAuthentication.jwtTokenAuthenticate, upload.single("profilephoto"), async (req, res, next) => {
+    console.log("requsetdata");
+    console.log(req.file);
     const userId = req.decode.id
     const fileQuery = `SELECT profile_image FROM tbl_users WHERE id=${userId} `;
     con.query(fileQuery, (err, imageData) => {
@@ -137,6 +140,7 @@ router.post('/photo-upload', userAuthentication.jwtTokenAuthenticate, upload.sin
             }
 
         }
+       
         const sqlQuery = `UPDATE tbl_users SET profile_image='${req.file.filename}' WHERE id=${userId}`;
         con.query(sqlQuery, (err, data) => {
             if (req.file) {
