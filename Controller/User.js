@@ -7,6 +7,7 @@ const con = require('../dbconnection');
 const hashPassword = require('../config/constant');
 const userAuthentication = require('../auth/authentication');
 const req = require('express/lib/request');
+var Users = require('../models/users');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './public/uploads')
@@ -22,39 +23,53 @@ router.get('/', (req, res, next) => {
     res.send('hello');
 })
 
-router.post('/', addUser.addUser, async (req, res, next) => {
-    const password = req.body.password
-    const hashingPassword = await hashPassword.cryptPassword(password)
-    console.log({ hashingPassword });
-    const first_name = req.body.first_name
-    const last_name = req.body.last_name;
-    let middle_name = "";
-    if (req.body.middle_name) {
-        middle_name = req.body.middle_name;
-    }
-    const email = req.body.email;
-    const phone_no = req.body.phone_no;
-    const randomCode = await hashPassword.randomCode(6)
-    const emailExist = `SELECT * FROM tbl_users WHERE email='${email}'`
-    console.log({ emailExist })
-    con.query(emailExist, function (err, result) {
-        console.log({ result });
-        if (result.length > 0) {
-            return res.status(200).json({
-                success: 'OK', message: 'Email is Already Taken.'
+router.post('/', async (req, res, next) => {
+    var newUser = new Users(req.body);
+    newUser.save((err, user) => {
+        if (err) {
+            console.log(err);
+            return res.json({
+                err: err
             })
         } else {
-            const userInsertQuery = `INSERT INTO tbl_users (first_name,middle_name,last_name,email,password,phone_no,unique_code) VALUES('${first_name}','${middle_name}','${last_name}','${email}','${hashingPassword}',${phone_no},'${randomCode}')`
-            console.log({ userInsertQuery });
-            con.query(userInsertQuery, function (err, result) {
-                if (err) throw err;
-                return res.status(200).json({
-                    success: 'OK', message: 'Successfully Registered'
-                })
-            });
+            return res.json({
+                status:'OK',
+                user: user
+            })
         }
-
     })
+    // const password = req.body.password
+    // const hashingPassword = await hashPassword.cryptPassword(password)
+    // console.log({ hashingPassword });
+    // const first_name = req.body.first_name
+    // const last_name = req.body.last_name;
+    // let middle_name = "";
+    // if (req.body.middle_name) {
+    //     middle_name = req.body.middle_name;
+    // }
+    // const email = req.body.email;
+    // const phone_no = req.body.phone_no;
+    // const randomCode = await hashPassword.randomCode(6)
+    // const emailExist = `SELECT * FROM tbl_users WHERE email='${email}'`
+    // console.log({ emailExist })
+    // con.query(emailExist, function (err, result) {
+    //     console.log({ result });
+    //     if (result.length > 0) {
+    //         return res.status(200).json({
+    //             success: 'OK', message: 'Email is Already Taken.'
+    //         })
+    //     } else {
+    //         const userInsertQuery = `INSERT INTO tbl_users (first_name,middle_name,last_name,email,password,phone_no,unique_code) VALUES('${first_name}','${middle_name}','${last_name}','${email}','${hashingPassword}',${phone_no},'${randomCode}')`
+    //         console.log({ userInsertQuery });
+    //         con.query(userInsertQuery, function (err, result) {
+    //             if (err) throw err;
+    //             return res.status(200).json({
+    //                 success: 'OK', message: 'Successfully Registered'
+    //             })
+    //         });
+    //     }
+
+    // })
 })
 
 router.put('/', (req, res, next) => {
