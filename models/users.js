@@ -1,34 +1,44 @@
 var mongoose = require("mongoose");
 var bcrypt = require("bcryptjs");
-
 const { v4: uuidv4 } = require('uuid');
-
 var UserSchema = mongoose.Schema({
   id: {
     type: String,
     default: () => { return uuidv4() },
     unique: null
   },
+  first_name: {
+    type: String,
+    required: true
+  },
+  middle_name: {
+    type: String,
+    required: false
+  },
+  last_name: {
+    type: String,
+    required: false
+  },
   email: {
     type: String,
-    
-    required: null
+    required: true
   },
   password: {
     type: String,
     required: null
   },
-
   avatar: {
     type: String,
     default: null
   },
-  
-  phone_number: {
+  phone_no: {
     type: String,
     default: null,
   },
-
+  status:{
+    type:Boolean,
+    default:true
+  },
   created_at: {
     type: Date,
     default: Date.now

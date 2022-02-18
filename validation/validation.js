@@ -1,5 +1,7 @@
 const Joi = require('joi');
 const addUser = (req, res, next) => {
+    console.log("data is coming");
+    console.log(req.body)
     const userSchema = Joi.object({
         first_name: Joi.string().required(),
         middle_name: Joi.string().allow(""),
