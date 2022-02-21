@@ -8,6 +8,7 @@ const hashPassword = require('../config/constant');
 const userAuthentication = require('../auth/authentication');
 const req = require('express/lib/request');
 var Users = require('../models/users');
+const { async } = require('regenerator-runtime');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './public/uploads')
@@ -24,12 +25,14 @@ router.get('/', (req, res, next) => {
 })
 
 router.post('/', addUser.addUser, async (req, res, next) => {
-    Users.count({ email: req.body.email }, (err, count) => {
+    Users.count({ email: req.body.email }, async (err, count) => {
         if (count > 0) {
             return res.status(200).json({
                 message: 'Already Registered'
             })
         } else {
+            const hashingPassword = await hashPassword.cryptPassword(req.body.password)
+            req.body.password = hashingPassword
             var newUser = new Users(req.body);
             newUser.save((err, user) => {
                 if (err) {
@@ -60,40 +63,32 @@ router.patch('/', (req, res, next) => {
 router.delete('/', (req, res, next) => {
     res.json({ success: 'ok delete request is working' })
 })
-router.post('/login', addUser.loginValidation, (req, res, next) => {
+router.post('/login', addUser.loginValidation, async (req, res, next) => {
     const email = req.body.email
     const userPassword = req.body.password;
     const userRecord = {}
-    const fetchUserDetails = `SELECT * FROM tbl_users WHERE email='${email}'`;
-    con.query(fetchUserDetails, (err, result) => {
-        if (result.length > 0) {
-            const password = result[0].password
-            try {
-                var passwordCheck = bcrypt.compareSync(userPassword, password);
-                if (passwordCheck) {
-                    const jwtToken = userAuthentication.jwtTokenCreate(result[0]);
-                    userRecord.id = result[0].id
-                    userRecord.email = result[0].email
-                    userRecord.uniqueCode = result[0].unique_code
-                    userRecord.token = jwtToken
-                    return res.status(200).json({
-                        status: 'OK',
-                        msg: 'Successfully Loggedin',
-                        data: userRecord
-                    })
-                }
-            } catch (error) {
-                console.log({ error });
-            }
-
-        } else {
-            return res.status(200).json({
-                status: 'FAILED',
-                msg: 'Incorrect Username Or Password'
-            })
-        }
+    const result = await Users.find({
+        email: req.body.email
     })
-
+    if (result.length > 0) {
+        const password = result[0].password
+        var passwordCheck = bcrypt.compareSync(userPassword, password);
+        const jwtToken = userAuthentication.jwtTokenCreate(result[0]);
+        userRecord.id = result[0].id
+        userRecord.email = result[0].email
+        userRecord.uniqueCode = result[0].unique_code
+        userRecord.token = jwtToken
+        return res.status(200).json({
+            status: 'OK',
+            msg: 'Successfully Loggedin',
+            data: userRecord
+        })
+    } else {
+        return res.status(200).json({
+            status: 'FAILED',
+            msg: 'Incorrect Username Or Password'
+        })
+    }
 })
 
 router.get('/get-code', async (req, res, next) => {

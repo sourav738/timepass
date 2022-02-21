@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const res = require('express/lib/response');
 const salt = 'myapp'
 const cryptPassword = async (password) => {
   let hash = bcrypt.hashSync(password, 10);
@@ -24,6 +25,8 @@ const randomCode = (length) => {
   }
   return result;
 }
+
+
 module.exports = {
   cryptPassword: cryptPassword,
   comparePassword: comparePassword,
