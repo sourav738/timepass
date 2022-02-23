@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const path = require('path');
 var upload = require('multer');
-
+let cookieParser = require('cookie-parser');
 // app.use(upload.array())
 require('dotenv').config();
 app.use(express.json())
@@ -12,6 +12,7 @@ app.set('view engine','ejs')
 app.set('views', path.join(__dirname, 'admin', 'views'));
 // express.static(path.join(__dirnam//e, '/public'));
 //console.log("directory", __dirname)
+app.use(cookieParser());
 const dbConnect = require('./dbconnection')
 const apiRoutes = require('./Routes/index')
 const adminRoutes=require('./admin/index')
