@@ -25,6 +25,7 @@ const addUser = (req, res, next) => {
     }
 }
 const loginValidation = (req, res, next) => {
+    console.log(req.body)
     const userSchema = Joi.object({
         email: Joi.string().email().required(),
         password: Joi.string().min(8).alphanum().required()
