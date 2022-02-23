@@ -7,7 +7,7 @@ $(document).ready(function(){
             password:pass
         })
         axios.post('/api/users/login',liginData).then(function(res){
-            console.log({res})
+          alert(res.data.msg)
         }).catch(function(err){
             console.log({err})
         })
