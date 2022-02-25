@@ -5,6 +5,9 @@ const router = require('express').Router()
 const Users = require('../../models/users')
 const userAuthentication = require('../../auth/authentication')
 var cookieParser = require('cookie-parser');
+const login=((req,res,next)=>{
+
+})
 router.get('/', (req, res, next) => {
     res.render('login', { Authentication: 'undefined' })
 });
@@ -41,4 +44,6 @@ router.post('/', [
         }
     }
 })
+
+
 module.exports = router;
