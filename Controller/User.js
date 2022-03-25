@@ -112,7 +112,15 @@ router.get('/get-code', async (req, res, next) => {
 })
 
 router.get('/list',async (req,res,next)=>{
-const userList = await Users.find({},'first_name last_name avatar')
+const userList = await Users.find({} ,'id first_name last_name avatar',{
+    projection: {
+        _id: 0,
+        password:0,
+        profile_type:false,
+        __v:0,
+        status:0
+    }
+} )
 userList.map((iitem,index)=>{
 iitem.avatar=iitem?.avatar? '/uploads'+iitem.avatar : 'null'
 })
@@ -120,7 +128,9 @@ return res.status(200).json(
     userList
 )
 });
-
+router.post('/send-request',(req,res,next)=>{
+    
+})
 router.post('/photo-upload', userAuthentication.jwtTokenAuthenticate, upload.single("profilephoto"), async (req, res, next) => {
     console.log("requsetdata");
     console.log(req.file);
