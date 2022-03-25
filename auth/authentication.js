@@ -28,6 +28,7 @@ const jwtTokenAuthenticate = (req,res,next) => {
     const jwtSecretKey = process.env.JWT_SECRET_KEY
     try {
         const decode = jwt.verify(token, jwtSecretKey)
+        console.log({decode})
         req.decode=decode;
         next()
     } catch (err) {

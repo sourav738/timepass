@@ -114,31 +114,45 @@ router.post('/photo-upload', userAuthentication.jwtTokenAuthenticate, upload.sin
     console.log("requsetdata");
     console.log(req.file);
     const userId = req.decode.id
+    if (req.file) {
+        await Users.updateOne(
+            { 
+                id: userId 
+            },
+            {
+                $set: { avatar: req.file.originalname },
+              
+            }
+
+        )
+    }
+
+    console.log({ userId })
     const fileQuery = `SELECT profile_image FROM tbl_users WHERE id=${userId} `;
-    con.query(fileQuery, (err, imageData) => {
-        if (imageData[0].profile_image != 'NULL') {
-            const existFileName = imageData[0].profile_image
-            try {
-                if (fs.existsSync('./public/uploads/' + existFileName)) {
-                    fs.unlinkSync('./public/uploads/' + existFileName);
-                }
+    // con.query(fileQuery, (err, imageData) => {
+    //     if (imageData[0].profile_image != 'NULL') {
+    //         const existFileName = imageData[0].profile_image
+    //         try {
+    //             if (fs.existsSync('./public/uploads/' + existFileName)) {
+    //                 fs.unlinkSync('./public/uploads/' + existFileName);
+    //             }
 
-            } catch (error) {
-            }
+    //         } catch (error) {
+    //         }
 
-        }
+    //     }
 
-        const sqlQuery = `UPDATE tbl_users SET profile_image='${req.file.filename}' WHERE id=${userId}`;
-        con.query(sqlQuery, (err, data) => {
-            if (req.file) {
-                const path = hashPassword.base_url;
-                return res.status(200).json({
-                    imagepath: path + '/uploads/' + req.file.filename,
-                    msg: 'Profile Photo Is uploaded'
-                })
-            }
-        })
-    })
+    //     const sqlQuery = `UPDATE tbl_users SET profile_image='${req.file.filename}' WHERE id=${userId}`;
+    //     con.query(sqlQuery, (err, data) => {
+    //         if (req.file) {
+    //             const path = hashPassword.base_url;
+    //             return res.status(200).json({
+    //                 imagepath: path + '/uploads/' + req.file.filename,
+    //                 msg: 'Profile Photo Is uploaded'
+    //             })
+    //         }
+    //     })
+    // })
 
 })
 module.exports = router

@@ -8,7 +8,8 @@ const addUser = (req, res, next) => {
         last_name: Joi.required(),
         email: Joi.string().email().required(),
         phone_no: Joi.string().length(10).pattern(/^[0-9]+$/),
-        password: Joi.string().min(8).alphanum().required()
+        password: Joi.string().min(8).alphanum().required(),
+        profile_type:Joi.string().required()
     });
     try {
         const validateCheck = userSchema.validate(req.body);

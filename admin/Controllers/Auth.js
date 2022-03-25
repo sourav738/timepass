@@ -9,7 +9,6 @@ const login = ((req, res, next) => {
 
 })
 router.get('/', (req, res, next) => {
-   
     if (req.cookies.userData) {
         if (req.cookies.userData.isloggedin) {
             console.log("success page")
@@ -33,7 +32,8 @@ router.post('/', [
         res.render('login', { alert, Authentication: 'undefined' })
     } else {
         const result = await Users.find({
-            email: req.body.useremail
+            email: req.body.useremail,
+            profile_type:1
         })
         if (result.length > 0) {
             const password = result[0].password
@@ -52,6 +52,4 @@ router.post('/', [
         }
     }
 })
-
-
 module.exports = router;

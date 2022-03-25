@@ -43,6 +43,10 @@ var UserSchema = mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  profile_type:{
+    type:Number,
+    default:2
+  }
 });
 
 // var User = module.exports = mongoose.model("User", UserSchema);
