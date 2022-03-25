@@ -9,6 +9,7 @@ const userAuthentication = require('../auth/authentication');
 const req = require('express/lib/request');
 var Users = require('../models/users');
 const { async } = require('regenerator-runtime');
+const res = require('express/lib/response');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './public/uploads')
@@ -110,12 +111,22 @@ router.get('/get-code', async (req, res, next) => {
     }
 })
 
+router.get('/list',async (req,res,next)=>{
+const userList = await Users.find({},'first_name last_name avatar')
+userList.map((iitem,index)=>{
+iitem.avatar=iitem?.avatar? '/uploads'+iitem.avatar : 'null'
+})
+return res.status(200).json(
+    userList
+)
+});
+
 router.post('/photo-upload', userAuthentication.jwtTokenAuthenticate, upload.single("profilephoto"), async (req, res, next) => {
     console.log("requsetdata");
     console.log(req.file);
     const userId = req.decode.id
     if (req.file) {
-        await Users.updateOne(
+        const imageUpdate=await Users.updateOne(
             { 
                 id: userId 
             },
@@ -125,6 +136,12 @@ router.post('/photo-upload', userAuthentication.jwtTokenAuthenticate, upload.sin
             }
 
         )
+        if(imageUpdate.matchedCount==1){
+            return res.status(200).json({
+                message:'Successfully Profile image is Updated'
+            })
+        }
+        console.log({imageUpdate})
     }
 
     console.log({ userId })
