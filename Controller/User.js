@@ -111,47 +111,78 @@ router.get('/get-code', async (req, res, next) => {
     }
 })
 
-router.get('/list',async (req,res,next)=>{
-const userList = await Users.find({} ,'id first_name last_name avatar',{
-    projection: {
-        _id: 0,
-        password:0,
-        profile_type:false,
-        __v:0,
-        status:0
-    }
-} )
-userList.map((iitem,index)=>{
-iitem.avatar=iitem?.avatar? '/uploads'+iitem.avatar : 'null'
-})
-return res.status(200).json(
-    userList
-)
+router.get('/list',userAuthentication.jwtTokenAuthenticate, async (req, res, next) => {
+    const userList = await Users.find({}, 'id first_name last_name avatar', {
+        projection: {
+            _id: 0,
+            password: 0,
+            profile_type: false,
+            __v: 0,
+            status: 0
+        }
+    })
+    userList.map((iitem, index) => {
+        iitem.avatar = iitem?.avatar ? '/uploads' + iitem.avatar : 'null'
+    })
+    return res.status(200).json(
+        userList
+    )
 });
-router.post('/send-request',(req,res,next)=>{
-    
+router.get('/details/:id', userAuthentication.jwtTokenAuthenticate, async (req, res, next) => {
+    console.log(req.params)
+    if (req?.params?.id) {
+        const userDetails = await Users.find(
+            {
+                id: req.params.id
+            },
+            'id first_name last_name avatar',
+            {
+                projection: {
+                    _id: false,
+                    password: 0,
+                    profile_type: false,
+                    __v: 0,
+                    status: 0
+                }
+            }
+        )
+        userDetails.map((iitem,index)=>{
+            iitem.avatar=iitem?.avatar ? '/uploads/'+iitem.avatar : 'null'
+        })
+        return res.status(200).json({
+            userDetails  
+        })
+    } else {
+        return res.status(200).json({
+            message: 'Parameterised missmatch'
+        })
+    }
+
+})
+router.post('/send-request', (req, res, next) => {
+
 })
 router.post('/photo-upload', userAuthentication.jwtTokenAuthenticate, upload.single("profilephoto"), async (req, res, next) => {
     console.log("requsetdata");
     console.log(req.file);
     const userId = req.decode.id
     if (req.file) {
-        const imageUpdate=await Users.updateOne(
-            { 
-                id: userId 
+        const imageUpdate = await Users.updateOne(
+            {
+                id: userId
             },
             {
                 $set: { avatar: req.file.originalname },
-              
+
             }
 
         )
-        if(imageUpdate.matchedCount==1){
+        if (imageUpdate.matchedCount == 1) {
             return res.status(200).json({
-                message:'Successfully Profile image is Updated'
+                message: 'Successfully Profile image is Updated'
             })
         }
-        console.log({imageUpdate})
+        console.log({ imageUpdate })
     }
 
     console.log({ userId })
